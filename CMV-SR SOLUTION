@@ -1,0 +1,42 @@
+##############################################################################
+##############################################################################        
+# 
+# by Darragh Mulcahy darraghmulcahy91@gmail.com 15.8.2016
+
+#### Variables
+# IN  - TKTTYPE - CAT
+# IN  - siteid - SITEID
+
+
+from psdi.mbo import Mbo
+from psdi.mbo import MboConstants
+from psdi.server import MXServer
+
+mxServer = MXServer.getMXServer()
+
+#sets the MAXADMIN rights to a string
+maxadminUserInfo = mxServer.getUserInfo("MAXADMIN")
+
+if RWO is not None:
+    woSet = mxServer.getMboSet("WOCHANGE", maxadminUserInfo)
+    woSet.setWhere(" wonum = '"+str(RWO)+"' ")
+    woSet.reset()
+    wo = woSet.moveFirst()
+    RWODESC = str(woSet.getString('description'))
+
+
+if SITEID == 'DEMO':
+    if CAT == 'Variance Request':
+            OWNER = 'CHANGE ADVISORY BOARD'
+            USRP = 'Low'
+            SEV = 'Sev 4'
+            DESC = '  Change Variance Request for change ' + str(RWO)
+            DETAILS = '- Change Request: \n' + str(RWO) + ' - ' + str(RWODESC) + '\n\n- Change Impact: \n' + str(CHGIMPACT) + '\n(1 - Critical, 2 - High, 3 - Medium, 4 - Low )\n\n- Change Start Date: \n' + str(INSTALLDATE) + '\n\n- Reason For Variance Request: \n' + str(RVR) + '\n\n- Business Justification: \n' + str(BUSJUST) + '\n\n- Incomplete Production Readiness Items (If Applicable): \n' + str(READYITEMS) + '\n\n- Risk Identification:\n ' + str(RISKID)
+			
+			if STAT not in ('REJECTED','APPROVED')
+	        worklogset = mbo.getMboSet ('WORKLOG')
+	        worklogentry = worklogset.add()
+            worklogentry.setValue('createby','MAXADMIN',Mbo.NOACCESSCHECK )
+            worklogentry.setValue('clientviewable',1)
+            worklogentry.setValue('logtype','CMV')
+            worklogentry.setValue('description_longdescription',DETAILS)
