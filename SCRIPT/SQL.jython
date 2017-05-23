@@ -1,0 +1,91 @@
+import sys
+
+from java.sql import Connection
+from java.sql import ResultSet
+from java.sql import ResultSetMetaData
+from java.sql import Statement
+from java.util import Date
+
+from psdi.security import UserInfo
+from psdi.server import DBManager
+from psdi.server import MXServer
+
+####### FUNCTIONS DEFINITION
+def executeUpdate(statement, sql):
+  print 'running sql: ' + sql
+
+  startTime = Date()
+  rowsUpdated = statement.executeUpdate(sql)
+  endTime = Date()
+
+  print 'rows updated: ' + str(rowsUpdated)
+  execTime = endTime.getTime() - startTime.getTime()
+  print 'execution time: ' + str(execTime / 1000) + '.' + str(execTime % 1000) + ' second(s)'
+  print ''
+  return
+
+def executeQuery(statement, sql):
+  print 'running sql: ' + sql
+  print ''
+
+  startTime = Date()
+  resultSet = statement.executeQuery(sql)
+  endTime = Date()
+
+  resultSetMetaData = resultSet.getMetaData()
+  colCount = resultSetMetaData.getColumnCount()
+  rowCount = 0
+  while resultSet.next():
+    rowCount += 1
+    print 'result ' + str(rowCount) + ':'
+    for col in range(1, colCount + 1):
+      colValue = resultSet.getString(col)
+      print '  ' + resultSetMetaData.getColumnName(col) + ': ' + (colValue if not colValue == None else 'null')
+  print ''
+  print 'results count: ' + str(rowCount)
+  execTime = endTime.getTime() - startTime.getTime()
+  print 'execution time: ' + str(execTime / 1000) + '.' + str(execTime % 1000) + ' second(s)'
+  print ''
+
+def openConnection(userId):
+  mxServer = MXServer.getMXServer()
+  userInfo = mxServer.getUserInfo(userId)
+  print 'opening connection'
+  connection = mxServer.getDBManager().getConnection(userInfo.getConnectionKey())
+  return connection
+
+def closeConnection(connection, commit):
+  if commit:
+    print 'committing'
+    connection.commit()
+  else:
+    print 'rolling back'
+    connection.rollback()
+    
+  print 'closing connection'
+  connection.close()
+####### FUNCTIONS DEFINITION
+
+############
+# Opens connection and performs insert/update/delete and/or select
+############
+commit = True
+try:
+  connection = openConnection('MAXADMIN')
+  statement = connection.createStatement()
+  print ''
+
+  ###### UNCOMMENT AND FILL SQL TO EXECUTE INSERT/UPDATE/DELETE
+  #sql= "INSERT/UPDATE/DELETE"
+  #executeUpdate(statement, sql)
+
+  ###### UNCOMMENT AND FILL SQL TO EXECUTE SELECT
+  sql = "SELECT"
+  executeQuery(statement, sql)
+
+except:
+  commit = False
+  print 'Error: ' + sys.exc_info()[1].getMessage()
+  print ''
+finally:
+  closeConnection(connection, commit)
